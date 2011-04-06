@@ -28,6 +28,7 @@ module Mongoid
             oldself = oldself.clone
             oldself.tll_top = id
             self.tll_prev = oldself._id
+            self.changed_at = Time.now
             oldself.save
           end
         end
