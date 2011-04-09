@@ -14,21 +14,22 @@ module Mongoid
         field :tll_top
         field :tll_prev
 
-        # When did the change occur?
-        field :changed_at, type: Time, default: Time.now
+        # By default, get the newest only.
+        default_scope where: {tll_top: nil}
         
         set_callback :save, :before, :tll_commit
+        attr_protected :tll_top, :tll_prev
         
         # Function that is called before saving a document.
         # It's responsible for the versioning.
         def tll_commit
-          oldself = self.class.where(_id: id).first
+          oldself = self.class.unscoped.where(_id: id).first
           if oldself # We've got a previous saved document.
-            self.class.where(tll_top: oldself._id).update_all(tll_top: id)
+            self.class.unscoped.where(tll_top: oldself._id)\
+              .update_all(tll_top: id)
             oldself = oldself.clone
             oldself.tll_top = id
             self.tll_prev = oldself._id
-            self.changed_at = Time.now
             oldself.save
           end
         end
@@ -41,7 +42,7 @@ module Mongoid
         # Return the newest version.
         def newest
           unless self.tll_top.nil?
-            return self.class.where(_id: self.tll_top).first
+            return self.class.unscoped.where(_id: self.tll_top).first
           end
 
           self
@@ -53,10 +54,10 @@ module Mongoid
         end
         
         # Return the previous version, if there is any.
-        # Will return nill when #oldest? is true.
+        # Will return nil when #oldest? is true.
         def prev
           unless self.tll_prev.nil?
-            return self.class.where(_id: self.tll_prev).first
+            return self.class.unscoped.where(_id: self.tll_prev).first
           end
 
           nil

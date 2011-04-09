@@ -24,7 +24,7 @@ class TestMongoidTLL < Test::Unit::TestCase
   end
 
   def teardown
-    MyDocument.destroy_all
+    MyDocument.delete_all
   end
 
   def test_basic_attributes
@@ -38,7 +38,6 @@ class TestMongoidTLL < Test::Unit::TestCase
     assert_respond_to @doc, :newest
     assert_respond_to @doc, :oldest?
     assert_respond_to @doc, :prev
-    assert_respond_to @doc, :changed_at
   end
 
   def test_add_version
@@ -47,7 +46,7 @@ class TestMongoidTLL < Test::Unit::TestCase
     assert @doc.newest?
     assert !@doc.oldest?
     assert_kind_of Mongoid::TLL, @doc.prev
-    assert_equal @doc.prev.content, "first version"
+    assert_equal "first version", @doc.prev.content
     assert @doc.prev.oldest?
     assert !@doc.prev.newest?
   end
@@ -59,10 +58,26 @@ class TestMongoidTLL < Test::Unit::TestCase
     @doc.save
 
     assert @doc.newest?
-    assert_equal @doc.prev.content, "second version"
-    assert_equal @doc.prev.prev.content, "first version"
-    assert_equal @doc.prev.newest.content, "third version"
-    assert_equal @doc.prev.prev.newest.content, "third version"
-    assert_equal @doc.prev.prev.prev, nil
+    assert_equal "second version", @doc.prev.content
+    assert_equal "first version", @doc.prev.prev.content
+    assert_equal "third version", @doc.prev.newest.content
+    assert_equal "third version", @doc.prev.prev.newest.content
+    assert_equal nil, @doc.prev.prev.prev
+  end
+
+  def test_query_only_newest
+    @doc.content = "first document, second version"
+    @doc.save
+    @doc2 = MyDocument.create(content: "second document, first version")
+    @doc2.content = "second document, second version"
+    @doc2.save
+
+    assert_equal 2, MyDocument.count
+    assert_equal 4, MyDocument.unscoped.count
+
+    t = ["first document, second version", "second document, second version"]
+    MyDocument.all.each_with_index do |d, i|
+      assert_equal t[i], d.content
+    end
   end
 end
