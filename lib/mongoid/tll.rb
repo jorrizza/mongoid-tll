@@ -41,7 +41,7 @@ module Mongoid
         
         # Return the newest version.
         def newest
-          unless self.tll_top.nil?
+          unless newest?
             return self.class.unscoped.where(_id: self.tll_top).first
           end
 
