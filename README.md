@@ -9,6 +9,9 @@ version.
 
 An example:
 
+    require 'mongoid'
+    require 'mongoid-tll'
+    
     class MyDocument
       include Mongoid::Document
       include Mongoid::TLL
