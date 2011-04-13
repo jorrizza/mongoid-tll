@@ -1,6 +1,6 @@
 spec = Gem::Specification.new do |s|
   s.name = 'mongoid-tll'
-  s.version = '0.0.3'
+  s.version = '0.0.4'
   s.summary = 'Top linked list plugin for Mongoid'
   s.platform = Gem::Platform::RUBY
   s.description = 'Creates a (doubly) top linked list out of your documents. Every change makes a new revision. Basically a read optimized versioning system.'

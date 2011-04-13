@@ -13,6 +13,7 @@ module Mongoid
         # The linked list pointers.
         field :tll_top
         field :tll_prev
+        index :tll_top
 
         # By default, get the newest only.
         default_scope where: {tll_top: nil}
