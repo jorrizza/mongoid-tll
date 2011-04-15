@@ -29,7 +29,7 @@ An example:
     >> "first version"
 
 A default scope is added to only find the newest versions by default. Use
-the `scopeless` method to circumvent this.
+the `unscoped` method to circumvent this.
 
 Other helper methods have been added:
 
